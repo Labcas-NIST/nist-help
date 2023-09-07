@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load wagtailcore_tags cache wagtailimages_tags %}
+{# 🔮 TODO: caching #}
+{% block body_class %}template-homepage{% endblock %}
+{% block pre-main %}
+    <section class='home-banner'>
+        {% image page.banner original %}
+    </section>
+{% endblock pre-main %}
+{% block content %}
+    {% for block in page.body %}
+        {% include_block block with block_id=block.id %}
+    {% endfor %}
+{% endblock content %}
+{# -*- Django HTML -*- #}

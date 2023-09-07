@@ -1,0 +1,28 @@
+{
+   "folders" : [
+      {
+         "file_exclude_patterns" : [
+            ".*.cfg",
+            "bootstrap.py",
+            "doc.txt",
+            "*.sublime-*",
+            "*.tmproj",
+            "*.tgz",
+            "*.log"
+         ],
+         "folder_exclude_patterns" : [
+            "bin",
+            "develop-eggs",
+            "dist",
+            "./media",
+            "./static",
+            "var",
+            "*.egg-info",
+            "python*",
+            ".venv",
+            "venv"
+         ],
+         "path" : "."
+      }
+   ]
+}
