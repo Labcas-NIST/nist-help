@@ -6,7 +6,7 @@
 . ${HOME}/.secrets/passwords.sh
 
 export DJANGO_SETTINGS_MODULE=nisthelp.settings.production
-export JPL_DS_RECAPTCHA_SITE_KEY JPL_DS_RECAPTCHA_SECRET_KEY
+export JPL_DS_RECAPTCHA_SITE_KEY JPL_DS_RECAPTCHA_SECRET_KEY DATABASE_URL
 
 
 if [ ! -d "src" -o ! -d "docker" ]; then
@@ -27,5 +27,4 @@ fi
 command=$1
 shift
 exec /usr/bin/env \
-    DATABASE_URL="postgresql://:@/nisthelp" \
     "src/manage.py" $command --settings local --pythonpath . "$@"
