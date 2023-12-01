@@ -11,7 +11,7 @@
         <div class='col-md-12'>
             <h1>{{page.title}}</h1>
         </div>
-        {% if request.user.is_staff or request.user.is_superuser %}
+        {% if request.user.is_superuser %}
             {% if page.spreadsheet_id %}
                 <div class='row'>
                     <div class='col-md-12'>
@@ -41,11 +41,14 @@
     </div>
     <p class='row'>
         {# intro body? #}
+        {% comment %}
         {% if page.spreadsheet_id %}
             <a href='https://docs.google.com/spreadsheets/d/{{page.spreadsheet_id}}/' class>
                 <i class="bi bi-box-arrow-up-right"></i> View as a spreadsheet
             </a>
         {% endif %}
+        {% endcomment %}
+
     </p>
 
     <div class='row mb-3'>
