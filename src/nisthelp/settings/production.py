@@ -5,6 +5,10 @@ from .base import *  # noqa: F401, F403
 import os
 
 DEBUG = False
+FORCE_SCRIPT_NAME = '/nist/help'
+WAGTAIL_GRAVATAR_PROVIDER_URL = None
+STATIC_ROOT = '/home/ddsaops/nist-help/static'
+MEDIA_ROOT = '/home/ddsaops/nist-help/media'
 
 
 # Secret Key
@@ -68,7 +72,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'mysite.log',
+            'filename': '/tmp/nisthelp.log',
             'formatter': 'verbose'
         },
     },
@@ -78,7 +82,7 @@ LOGGING = {
             'propagate': True,
             'level': 'INFO',
         },
-        'MYAPP': {
+        'root': {
             'handlers': ['file'],
             'level': 'INFO',
         },

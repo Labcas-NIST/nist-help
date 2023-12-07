@@ -17,8 +17,6 @@ eggs
 typescript
 venv
 var/
-local.py
-rebuild.csh
 static/
 media/
 backups/

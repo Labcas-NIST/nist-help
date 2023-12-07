@@ -296,3 +296,19 @@ a.nav-link:hover, a.navbar-brand:hover {
 .tree_view_annotation {
     display: none;
 }
+.helptext {
+    font-style: italic;
+    font-size: 90%;
+    color: red !important;
+}
+label.is-required:before, legend.is-required:before {
+    content: "✱";
+    color: red;
+    padding-right: 0.2rem;
+}
+label.is-required {
+    margin-bottom: 0.2rem;
+}
+label {
+    padding-top: 1rem;
+}

@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'blocks',
     'content',
     'controls',
+    'nistauth',
     'wagtail.contrib.table_block',
     'wagtail.contrib.typed_table_block',
     'wagtail.contrib.modeladmin',  # Needed by wagtailmenus
@@ -164,14 +165,14 @@ USE_TZ        = True
 # 🔗 https://docs.djangoproject.com/en/4.1/ref/contrib/staticfiles/#manifeststaticfilesstorage
 
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-STATIC_URL = os.getenv('STATIC_URL', '/static/')
+STATIC_URL = os.getenv('STATIC_URL', '/nist/help/static/')
 STATIC_ROOT = os.getenv('STATIC_ROOT', os.path.join(os.path.abspath(os.getcwd()), 'static'))
 
 
 # Media Files
 # -----------
 
-MEDIA_URL = os.getenv('MEDIA_URL', '/media/')
+MEDIA_URL = os.getenv('MEDIA_URL', '/nist/help/media/')
 MEDIA_ROOT = os.getenv('MEDIA_ROOT', os.path.join(os.path.abspath(os.getcwd()), 'media'))
 
 
@@ -227,3 +228,20 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
+
+
+# Search
+# ------
+
+WAGTAILSEARCH_BACKENDS = {
+    'default': {
+        'BACKEND': 'wagtail.search.backends.elasticsearch7',
+        'AUTO_UPDATE': True,
+        'ATOMIC_REBUILD': True,
+        'INDEX': 'wagtail',
+        'TIMEOUT': 5,
+        'OPTIONS': {},
+        'INDEX_SETTINGS': {},
+        'URLS': [os.getenv('ELASTICSEARCH_URL', 'http://localhost:9200')]
+    }
+}
