@@ -37,8 +37,13 @@ export PGPASSWORD
 #
 # First, do the database. PGPASSWORD must've been set by the secrets
 
+date=`date --utc --iso-8601=date`
 pg_dump --username="${PGUSERNAME}" --dbname=nisthelp \
-    | bzip2 --compress --stdout --best > ${BACKUP_DIR}/database/`date --utc --iso-8601=date`.sql.bz2
+    | bzip2 --compress --stdout --best > ${BACKUP_DIR}/database/$date.sql.bz2
+
+# Link the latest
+rm --force ${BACKUP_DIR}/database/latest.sql.bz2
+ln --symbolic ${BACKUP_DIR}/database/$date.sql.bz2 ${BACKUP_DIR}/database/latest.sql.bz2
 
 
 # Media
