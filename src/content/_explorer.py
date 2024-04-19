@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-'''😌 EDRN site content models for the CDE explorer.'''
+'''😌 NIST site content models for the CDE explorer.'''
 
 
 from wagtail.models import Page
