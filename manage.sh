@@ -5,6 +5,7 @@
 
 . ${HOME}/.secrets/passwords.sh
 
+
 export DATABASE_URL=${DATABASE_URL:-postgres://:@/nisthelp}
 export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-local}
 export LDAP_URI=${LDAP_URI:-ldaps://localhost:1636}

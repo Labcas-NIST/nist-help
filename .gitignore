@@ -21,3 +21,4 @@ static/
 media/
 backups/
 *.wsgi
+local.py
