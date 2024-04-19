@@ -11,14 +11,15 @@ BACKUP_DIR=${BACKUP_DIR:-/home/ddsaops/backups/nisthelp}
 MEDIA_DIR=${MEDIA_DIR:-/home/ddsaops/nist-help/media}
 WORKSPACE=${WORKSPACE:-${PWD:-`pwd`}}
 source="ddsa-labcas.jpl.nasa.gov"
+user=ddsaops
 
 # Do it
 # -----
 
 [ -d ${WORKSPACE}/media ] || mkdir ${WORKSPACE}/media
 rm --force latest.sql.bz2
-scp $source:$BACKUP_DIR/database/latest.sql.bz2 .
-rsync --checksum --no-motd --recursive --delete --progress $source/$MEDIA_DIR ${WORKSPACE}
+scp ${user}@${source}:$BACKUP_DIR/database/latest.sql.bz2 .
+rsync --checksum --no-motd --recursive --delete --progress ${user}@${source}/$MEDIA_DIR ${WORKSPACE}
 
 # Done!
 # -----
