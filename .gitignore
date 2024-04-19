@@ -22,3 +22,4 @@ media/
 backups/
 *.wsgi
 local.py
+./*.sql.bz2
