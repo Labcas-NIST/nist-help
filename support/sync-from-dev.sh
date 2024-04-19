@@ -5,7 +5,7 @@
 #
 # Synchronize the NIST Help portal DB from Jenins to local for development
 
-PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin
 export PATH
 WORKSPACE=${WORKSPACE:-${PWD:-`pwd`}}
 media=${WORKSPACE}/media
