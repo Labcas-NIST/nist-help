@@ -19,7 +19,7 @@ user=ddsaops
 [ -d ${WORKSPACE}/media ] || mkdir ${WORKSPACE}/media
 rm --force latest.sql.bz2
 scp ${user}@${source}:$BACKUP_DIR/database/latest.sql.bz2 .
-rsync --checksum --no-motd --recursive --delete --progress ${user}@${source}/$MEDIA_DIR ${WORKSPACE}
+rsync --checksum --no-motd --recursive --delete --progress ${user}@${source}:$MEDIA_DIR ${WORKSPACE}
 
 # Done!
 # -----
