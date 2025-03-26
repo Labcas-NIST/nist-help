@@ -6,7 +6,7 @@
 # Download the latest production database, apply migrations, and get ready to rock and roll.
 
 
-jpl_sys_ipv4=172.16.16.3
+jpl_sys_ipv4=172.16.16.10
 
 
 # Argument check

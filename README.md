@@ -15,6 +15,10 @@ To run this software locally, you'll need:
 
 You'll also need a copy of the current content database from `ddsa-labcas` if you want to experiment with the current content. Alternatively, you can also start from scratch.
 
+Creating a database user:
+
+    createuser --createdb --login --createrole unh
+
 Regardless, begin by creating a database:
 
     createdb nisthelp
@@ -22,13 +26,26 @@ Regardless, begin by creating a database:
 Next, run the following commands:
 
     ./manage.sh makemigrations
-
-
-
-
+    ./manage.sh migrate
 
 ```console
 $ createdb nisthelp
 $ ./manage.sh migrate
 $ ./manage.sh createsuperuser --username root --email your@email.com
 ```
+
+
+## Transfering Production Content
+
+A cron job runs `@weekly` on `ddsa-labcas` under the `ddsaops` user that runs `pg_dump` to get a dump of the content database. Meanwhile on `tumor`, a Jenkins job runs `@weekly` that executes `support/sync-from-ops.sh` to bring that SQL dump and the `media` folder from `ddsa-labcas` to `tumor`. 
+
+You'll then need to run the following on the JPL laptop:
+
+    cd nist-help
+    support/sync-from-dev.sh
+
+And finally you can then run
+
+    support/devrebuild.sh
+
+to rebuild everything.
