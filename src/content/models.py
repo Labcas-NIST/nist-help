@@ -171,7 +171,7 @@ class PostmanAPIPage(Page):
     template = 'content/postman-api-page.html'
     postman = models.TextField(null=False, blank=False, help_text='Postman JSON Export')
     swagger = models.TextField(null=False, blank=False, help_text='OpenAPI YAML Conversion')
-    postmanerator = models.TextField(null=False, blank=True, help_text='Postmanerator documentation using EDRN Portal Theme')
+    postmanerator = models.TextField(null=False, blank=True, help_text='Postmanerator documentation using NIST Help Theme')
     content_panels = Page.content_panels + [FieldPanel('postman'), FieldPanel('swagger'), FieldPanel('postmanerator')]
 
     def serve(self, request: HttpRequest) -> HttpResponse:
