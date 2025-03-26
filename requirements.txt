@@ -6,6 +6,7 @@ django-widget-tweaks       ~= 1.4.12
 django_auth_ldap           ~= 4.1.0
 elasticsearch              == 7.13.4  # For OpenSearch compatibility
 gdown                      ~= 4.7.3
+numpy                      == 1.24.4
 pandas                     == 1.5.3
 psycopg2                   ~= 2.9.6
 wagtail                    ~= 5.2.3
