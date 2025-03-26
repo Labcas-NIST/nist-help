@@ -49,3 +49,18 @@ And finally you can then run
     support/devrebuild.sh
 
 to rebuild everything.
+
+
+
+## Deploying into Production
+
+Try:
+
+    cd nist-help
+    git pull
+    ./manage.sh makemigrations
+    ./manage.sh migrate
+
+Then ask a sysadmin to run
+
+    sudo /sbin/service httpd reload
