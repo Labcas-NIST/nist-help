@@ -5,8 +5,10 @@
 
 from ._explorer import CDEExplorerPage, CDEExplorerObject, CDEExplorerAttribute, CDEPermissibleValue  # noqa: F401
 from blocks import blocks
+from django.conf import settings
 from django.db import models
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from modelcluster.fields import ParentalKey
 from wagtail import blocks as wagtail_core_blocks
@@ -162,3 +164,30 @@ class EmailFormField(LimitedFormField):
 
 class CaptchaEmailFormField(LimitedFormField):
     page = ParentalKey(CaptchaEmailForm, on_delete=models.CASCADE, related_name='form_fields')
+
+
+class PostmanAPIPage(Page):
+    page_description = 'A page that shows an Application Programmer Interface specified by Postman and formatted by Postmanerator'
+    template = 'content/postman-api-page.html'
+    postman = models.TextField(null=False, blank=False, help_text='Postman JSON Export')
+    swagger = models.TextField(null=False, blank=False, help_text='OpenAPI YAML Conversion')
+    postmanerator = models.TextField(null=False, blank=True, help_text='Postmanerator documentation using EDRN Portal Theme')
+    content_panels = Page.content_panels + [FieldPanel('postman'), FieldPanel('swagger'), FieldPanel('postmanerator')]
+
+    def serve(self, request: HttpRequest) -> HttpResponse:
+        if request.GET.get('download'):
+            response = HttpResponse(charset=settings.DEFAULT_CHARSET)
+            fn_prefix = slugify(self.title)
+            if request.GET.get('download') == 'postman':
+                response.headers['Content-Type'] = 'application/json'
+                response.headers['Content-Disposition'] = f'attachment; filename="{fn_prefix}.json"'
+                response.content = self.postman.encode(settings.DEFAULT_CHARSET)
+            elif request.GET.get('download') == 'openapi':
+                response.headers['Content-Type'] = 'application/yaml'  # Note: this mime type is currently in draft
+                response.headers['Content-Disposition'] = f'attachment; filename="{fn_prefix}.yaml"'
+                response.content = self.swagger.encode(settings.DEFAULT_CHARSET)
+            else:
+                raise ValueError('Expected "postman" or "openapi"')
+            return response
+        else:
+            return super().serve(request)
