@@ -3,13 +3,13 @@
 # Sync NIST Help Portal DB to local directory
 # ===========================================
 #
-# Synchronize the NIST Help portal DB from Jenins to local for development
+# Synchronize the NIST Help portal DB from cancer to localhost for development.
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/bin
 export PATH
 WORKSPACE=${WORKSPACE:-${PWD:-`pwd`}}
 media=${WORKSPACE}/media
-source=tumor.jpl.nasa.gov:/usr/local/edrn/nist/help/ops-nist
+source=cancer.jpl.nasa.gov:/usr/local/edrn/nist/help/nist-help
 
 
 # PostgreSQL Database
@@ -23,7 +23,7 @@ rm -f "latest.sql.bz2"
 scp -p $source/latest.sql.bz2 ${WORKSPACE}
 
 if [ \! -f "latest.sql.bz2" ]; then
-    echo "Failed to get $source/latest.sql.bz2" 1>&2
+    echo "Failed to get $source/latest.sql.bz2" 1>&2 
     exit 1
 fi
 

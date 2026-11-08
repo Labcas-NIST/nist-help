@@ -5,10 +5,8 @@ from .base import *  # noqa: F401, F403
 import os
 
 DEBUG = False
-FORCE_SCRIPT_NAME = '/nist/help'
+FORCE_SCRIPT_NAME = os.getenv('FORCE_SCRIPT_NAME')
 WAGTAIL_GRAVATAR_PROVIDER_URL = None
-STATIC_ROOT = '/home/ddsaops/nist-help/static'
-MEDIA_ROOT = '/home/ddsaops/nist-help/media'
 
 
 # Secret Key

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.postgres',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -191,7 +192,7 @@ WAGTAIL_SITE_NAME = 'JPL NIST Help'
 
 WAGTAILSEARCH_BACKENDS = {
     'default': {
-        'BACKEND': 'wagtail.search.backends.elasticsearch7',
+        'BACKEND': 'wagtail.search.backends.database',
         'AUTO_UPDATE': True,
         'ATOMIC_REBUILD': True,
         'INDEX': 'wagtail',
@@ -208,14 +209,6 @@ WAGTAILSEARCH_BACKENDS = {
 # 🔗 https://docs.wagtail.org/en/stable/reference/settings.html#wagtailadmin-base-url
 
 WAGTAILADMIN_BASE_URL = os.getenv('BASE_URL', 'https://labcas.jpl.nasa.gov/nist/help/')
-
-
-# reCAPTChA
-#
-# 🔗 https://github.com/springload/wagtail-django-recaptcha
-
-RECAPTCHA_PUBLIC_KEY = os.getenv('JPL_DS_RECAPTCHA_SITE_KEY', '')
-RECAPTCHA_PRIVATE_KEY = os.getenv('JPL_DS_RECAPTCHA_SECRET_KEY', '')
 
 
 # Email

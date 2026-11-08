@@ -1,0 +1,163 @@
+# Taskfile
+# ========
+#
+# The NIST Help site's Task file, which has convenient things to run. Depends on https://taskfile.dev/
+
+---
+
+env:
+    ALLOWED_HOSTS: '{{.ALLOWED_HOSTS | default "*"}}'
+    BASE_URL: '{{.BASE_URL | default "http://localhost:6468/"}}'
+    port: '{{.port | default 6468}}'
+    python: '{{.python | default "python3.11"}}'
+    DATABASE_URL: '{{.DATABASE_URL | default "postgresql://unh:@localhost:5432/nisthelp"}}'
+    DATA_DIR: '{{.DATA_DIR | default (and .PWD (printf "%s/docker-data" .PWD)) | default "/usr/local/labcas/nisthelp/docker-data"}}'
+    DJANGO_SETTINGS_MODULE: '{{.DJANGO_SETTINGS_MODULE | default "local"}}'
+    LDAP_URI: '{{.LDAP_URI | default "ldaps://localhost:1636"}}'
+    SECRET_KEY: '{{.SECRET_KEY | default (trunc 10 (replace "-" "" (uuid | toString)))}}'
+
+tasks:
+    clean:
+        desc: "P5 Python virtual environment destruction"
+        summary: "Completely removes the Python venv"
+        preconditions:
+            -   test -d .venv
+        cmds:
+            -   rm -rf .venv
+
+    venv:
+        desc: "P5 Python virtual environment"
+        summary: "Creates the Python venv for NIST Help"
+        sources:
+            -   requirements.txt
+        generates:
+            -   .venv/**
+        cmds:
+            -   "rm -rf .venv"
+            -   "{{.python}} -m venv .venv"
+            -   ".venv/bin/pip install --upgrade --quiet pip"
+            -   ".venv/bin/pip install --requirement requirements.txt"
+
+    dev-rebuild:
+        desc: "Rebuild entire NIST Help for local development"
+        summary: >
+            Erases the local PostgreSQL database and media blobs, imports the latest from the JPL host,
+            and upgrades it to the current development schema.
+
+            ⚠️ Warning! This erases any local database or blobs you may have!
+        deps: [venv]
+        silent: false
+        interactive: false
+        cmds:
+            -   dropdb --force --if-exists "nisthelp"
+            -   createdb "nisthelp" "NIST Help"
+            -   dropuser --if-exists unh
+            -   createuser --createdb --login --createrole unh
+            -   ./support/sync-from-dev.sh
+            -   touch media/.nobackup
+            -   bzip2 --decompress --stdout latest.sql.bz2 | psql --dbname=nisthelp --echo-errors --quiet --set=ON_ERROR_STOP=on
+            -   ./manage.sh makemigrations --settings local --pythonpath .
+            -   ./manage.sh migrate --settings local --pythonpath .
+            -   ./manage.sh collectstatic --settings local --pythonpath . --no-input --clear --link
+            -   ./manage.sh nist_upgrade --settings local --pythonpath .
+            -   ./manage.sh clear_cache --settings local --pythonpath . --all
+
+    manage:
+        desc: "Local Django admin"
+        summary: >
+            Run Django admin with a command=value command, defaults to shell_plus. For example, to do an index
+            rebuild, run `task manage command=wagtail_rebuild_index`. For command-specific arguments, pass them
+            after `--`. For example: `task manage command=ping_google -- https://my.com/sitemap.xml`.
+        deps: [venv]
+        aliases: [shell]
+        silent: true
+        interactive: true
+        vars:
+            command: "{{.command | default \"shell_plus\"}}"
+        cmds:
+            -   ./manage.sh {{.command}} --settings local --pythonpath . {{.CLI_ARGS}}
+
+    run:
+        desc: "Local Django server"
+        summary: >
+            Run the Django lightweight web server for development and serving of static files. The
+            port is {{.port}} and can be overriden: `task run port=1234`.
+        aliases: [default]
+        deps: [venv]
+        # I thought we could use "task:" here to have one task call the "manage" task, but it doesn't
+        # work at all.
+        silent: true
+        interactive: true
+        cmds:
+            -   ./manage.sh runserver --settings local --pythonpath . {{.port}}
+
+    image:
+        desc: "Docker image construction"
+        summary: >
+            Build the dependent wheels and the Docker image.
+        interactive: false
+        cmds:
+            -   docker buildx build --progress plain --tag edrndocker/nisthelp:latest --file docker/Dockerfile --load .
+
+    # compose-up:
+    #     desc: "P5 Docker foreground composition running"
+    #     summary: "Starts the P5 Docker composition by bringing it `up` in the foreground."
+    #     interactive: false
+    #     env:
+    #         CERT_CN: "dev.dev"
+    #         IMAGE_VERSION: "latest"
+    #         LDAP_URI: "ldaps://host.docker.internal:1636"
+    #         POSTGRES_PASSWORD: "s3cr3t"
+    #         REDIS_PASSWORD: "s3cr3t"
+    #         SECURE_COOKIES: "False"
+    #     cmds:
+    #         -   docker compose --profile tls --file docker/docker-compose.yaml up --remove-orphans
+
+    # comp-portal-shell:
+    #     desc: "Docker foreground composition interactive exec in portal"
+    #     summary: "For when you need a handy shell inside the portal container in a running Docker composition."
+    #     interactive: true
+    #     env:
+    #         CERT_CN: "dev.dev"
+    #         IMAGE_VERSION: "latest"
+    #         LDAP_URI: "ldaps://host.docker.internal:1636"
+    #         POSTGRES_PASSWORD: "s3cr3t"
+    #         REDIS_PASSWORD: "s3cr3t"
+    #         SECURE_COOKIES: "False"
+    #     cmds:
+    #         -   docker compose --profile tls --file docker/docker-compose.yaml exec portal sh
+
+    # comp-portal-restart:
+    #     desc: "P5 Docker foreground composition restart portal"
+    #     summary: "In a running Docker composition for P5, this restarts the portal service only."
+    #     interactive: false
+    #     env:
+    #         CERT_CN: "dev.dev"
+    #         IMAGE_VERSION: "latest"
+    #         LDAP_URI: "ldaps://host.docker.internal:1636"
+    #         POSTGRES_PASSWORD: "s3cr3t"
+    #         REDIS_PASSWORD: "s3cr3t"
+    #         SECURE_COOKIES: "False"
+    #     cmds:
+    #         -   docker compose --profile tls --file docker/docker-compose.yaml restart portal
+
+    compose:
+        desc: "NIST Help Docker Compose shortcut"
+        summary: "Shortcut for `docker compose`; add `-- COMMAND ARGS ...` for composition commands"
+        interactive: false
+        env:
+            CERT_CN: "dev.dev"
+            IMAGE_VERSION: "latest"
+            LDAP_URI: "ldaps://host.docker.internal:1636"
+            POSTGRES_PASSWORD: "s3cr3t"
+            REDIS_PASSWORD: "s3cr3t"
+            SECURE_COOKIES: "False"
+        cmds:
+            -   docker compose --project-name nisthelp --profile tls --file docker/docker-compose.yaml {{.CLI_ARGS}}
+
+dotenv: ['.env', 'env', '{{.HOME}}/.secrets/passwords.sh']
+version: '3'
+
+...
+
+# -*- mode: YAML; tab-width: 4 -*-

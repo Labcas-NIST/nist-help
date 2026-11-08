@@ -13,7 +13,7 @@ from wagtail.images.models import Image
 from wagtail.models import Site, Page
 from wagtail.rich_text import RichText
 from wagtailmenus.models import FlatMenu, FlatMenuItem
-import pkg_resources
+from importlib.resources import files
 
 
 class Command(BaseCommand):
@@ -23,7 +23,7 @@ class Command(BaseCommand):
     search_description = 'NIST LabCAS provides help in its use'
 
     def get_html_text(self, name: str) -> RichText:
-        return RichText(pkg_resources.resource_string(__name__, f'data/{name}.html').decode('utf-8').strip())
+        return RichText(files(__package__).joinpath('data', f'{name}.html').read_text(encoding='utf-8').strip())
 
     def set_site(self):
         '''Set up the Site object for NIST Help, returning it.'''
@@ -35,7 +35,7 @@ class Command(BaseCommand):
         if old_root.title == 'NIST Help':
             return site
 
-        with pkg_resources.resource_stream(__name__, 'data/home-banner.jpg') as f:
+        with files(__package__).joinpath('data', 'home-banner.jpg').open('rb') as f:
             banner_image = ImageFile(f, name='nist-help-banner-image')
             image = Image(title='NIST Help Banner Image', file=banner_image)
             image.save()

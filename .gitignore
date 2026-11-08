@@ -23,3 +23,4 @@ backups/
 *.wsgi
 local.py
 *.sql.bz2
+docker-data
