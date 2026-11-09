@@ -2,9 +2,9 @@
 # Single source of truth for detect-secrets arguments.
 #
 # Usage:
-#   scripts/detect_secrets_baseline.sh scan   # Regenerate .secrets.baseline
-#   scripts/detect_secrets_baseline.sh audit  # Interactively audit .secrets.baseline
-#   scripts/detect_secrets_baseline.sh        # Check for new secrets vs baseline
+#   support/detect_secrets_baseline.sh scan   # Regenerate .secrets.baseline
+#   support/detect_secrets_baseline.sh audit  # Interactively audit .secrets.baseline
+#   support/detect_secrets_baseline.sh        # Check for new secrets vs baseline
 #
 set -e
 
@@ -52,7 +52,7 @@ print('\n'.join(sorted(lines)))
 if [[ "$1" = "scan" ]]; then
     detect-secrets scan "${DETECT_SECRETS_ARGS[@]}" > .secrets.baseline
     echo "Updated .secrets.baseline"
-    echo "Next step: run 'scripts/detect_secrets_baseline.sh audit' to review and classify detected secrets."
+    echo "Next step: run 'support/detect_secrets_baseline.sh audit' to review and classify detected secrets."
 elif [[ "$1" = "audit" ]]; then
     detect-secrets audit .secrets.baseline
 else
@@ -66,7 +66,7 @@ print(count)
     if [[ "$unaudited" -gt 0 ]]; then
         echo "⚠️ Attention Required! ⚠️" >&2
         echo "$unaudited secret(s) in .secrets.baseline have not been audited." >&2
-        echo "Run 'scripts/detect_secrets_baseline.sh audit' to review and classify each detected secret." >&2
+        echo "Run 'support/detect_secrets_baseline.sh audit' to review and classify each detected secret." >&2
         exit 1
     fi
 
