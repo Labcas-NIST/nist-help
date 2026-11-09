@@ -9,7 +9,7 @@
 export DATABASE_URL=${DATABASE_URL:-postgres://:@/nisthelp}
 export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-local}
 export LDAP_URI=${LDAP_URI:-ldaps://localhost:1636}
-export JPL_DS_RECAPTCHA_SITE_KEY JPL_DS_RECAPTCHA_SECRET_KEY DATABASE_URL
+export DATABASE_URL
 
 
 if [ ! -d "src" -o ! -d "docker" ]; then

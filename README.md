@@ -15,52 +15,40 @@ To run this software locally, you'll need:
 
 You'll also need a copy of the current content database from `ddsa-labcas` if you want to experiment with the current content. Alternatively, you can also start from scratch.
 
-Creating a database user:
+Common [Task](https://taskfile.dev/) commands:
 
-    createuser --createdb --login --createrole unh
-
-Regardless, begin by creating a database:
-
-    createdb nisthelp
-
-Next, run the following commands:
-
-    ./manage.sh makemigrations
-    ./manage.sh migrate
-
-```console
-$ createdb nisthelp
-$ ./manage.sh migrate
-$ ./manage.sh createsuperuser --username root --email your@email.com
-```
+- `task clean` — removes the Python virtual environment
+- `task venv` — creates the Python virtual environment
+- `task dev-rebuild` — rebuilds the NIST Help portal for local development, gathering the latest content from the production host
+- `task run` — also the default, starts a local server
 
 
 ## Transfering Production Content
 
-A cron job runs `@weekly` on `ddsa-labcas` under the `ddsaops` user that runs `pg_dump` to get a dump of the content database. Meanwhile on `tumor`, a Jenkins job runs `@weekly` that executes `support/sync-from-ops.sh` to bring that SQL dump and the `media` folder from `ddsa-labcas` to `tumor`. 
+A cron job runs `@weekly` on `ddsa-labcas` under the `ddsaops` user that runs `pg_dump` to get a dump of the content database. Meanwhile on `cancer`, a cron job runs `@weekly` that executes `support/sync-from-ops.sh` to bring that SQL dump and the `media` folder from `ddsa-labcas` to `cancer`.
 
-You'll then need to run the following on the JPL laptop:
-
-    cd nist-help
-    support/sync-from-dev.sh
-
-And finally you can then run
-
-    support/devrebuild.sh
-
-to rebuild everything.
+The `task dev-rebuild` command will then take that content from `cancer` and rebuild the NIST help portal for local development.
 
 
+## Containerization
 
-## Deploying into Production
+Run `task image` to make the Docker image, `edrndocker/nisthelp:latest`, which will be loaded into the local Docker registry. You can then tag and push it to the Docker Hub or elsewhere.
 
-Try:
+Start the Docker composition locally with
 
-    cd nist-help
-    git pull
-    ./manage.sh makemigrations
-    ./manage.sh migrate
+    task compose -- up --detach
 
-Then ask a sysadmin to run
+Then load the database and apply migrations:
 
-    sudo /sbin/service httpd reload
+    task compose -- exec db createuser --username=postgres --createdb --login --createrole unh
+    task compose -- exec db psql --username=postgres --command="ALTER ROLE unh PASSWORD 's3cr3t'"
+    task compose -- exec db createdb --username=postgres --encoding=UTF8 --owner=postgres nisthelp
+    bzip2 --decompress --stdout latest.sql.bz2 | task compose -- exec --no-tty db psql --username=postgres --dbname=nisthelp --echo-errors --set=ON_ERROR_STOP=on
+    task compose -- exec portal bin/django-admin migrate 
+    
+Then you can visit the site at https://localhost:4239/ (ignoring the self-signed certificate warning).
+
+
+## Deployment at JPL
+
+Run `support/jpl-deploy.sh` to deploy the NIST Help portal to the JPL production server.
